@@ -5,7 +5,6 @@ CC =gcc
 all: ttt2.o show_node count_nodes
 
 
-
 Clean:
 
 	rm* .o -i

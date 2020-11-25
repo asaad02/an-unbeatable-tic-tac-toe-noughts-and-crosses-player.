@@ -9,11 +9,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ttt.h"
-#define MIN(a,b) (((a)<(b))?(a):(b))
-#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MIN(a,b) (((a)>(b))?(b):(a))
+#define MAX(a,b) (((a)<(b))?(b):(a))
 
 
-/* Helper function return the max integer  
+/* Helper function return the max integer 
 int max (int first , int second ){
     if (first < second )
     {
@@ -26,7 +26,7 @@ int max (int first , int second ){
     
     
 }*/
-/* Helper function return the min integer  
+/* Helper function return the min integer 
 int min (int first , int second ){
     if (first > second)
     {
@@ -60,7 +60,7 @@ int depth( Board board ){
         {
             markers++;
         }
-        if (board[i] == 'x' || board[i] == 'o')
+        else if (board[i] == 'x' || board[i] == 'o')
         {
             markers++;
         }
@@ -85,12 +85,13 @@ char winner( Board board ){
             return 'O'; // if O has won the game
         }
         
-        if (depth(board ) < 9)
-        {
-            return '?'; // if the game is incomplete and no-one has won.
-        }
-        return  '-'; //if the game is over and a draw
         
+         //if the game is over and a draw
+        
+    }
+    if (depth(board ) < 9)
+    {
+        return '?'; // if the game is incomplete and no-one has won.
     }
     return  '-';
     
@@ -112,7 +113,7 @@ char turn( Board board ){
         return '-'; // game over
     }
     // if X or O won the game 
-    if (winner(board ) == 'X' ||winner(board ) == 'O' )
+    if (winner(board ) == 'X' || winner(board ) == 'O' )
     {
         // return game over
         return '-'; 
@@ -216,7 +217,7 @@ void join_graph( Board board ){
 /* This function should assign a score to each entry in the htable */
 void compute_score(){
     // for loop going through the htable
-    for (int i = HSIZE ; i >= 0; i--)
+    for (int i = HSIZE - 1; i >= 0; i--)
     {
         // htable has an init of 1 
         if (htable[i].init == 1)
@@ -255,7 +256,7 @@ void compute_score(){
                 
             }
             // if it is O’s turn
-            if (htable[i].turn == 'O')
+            else if (htable[i].turn == 'O')
             {
                 htable[i].score = 1;
 
