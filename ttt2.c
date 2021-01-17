@@ -9,35 +9,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ttt.h"
-#define MIN(a,b) (((a)>(b))?(b):(a))
-#define MAX(a,b) (((a)<(b))?(b):(a))
+#define imax(a,b) (((a)<(b))?(b):(a))
+#define imin(a,b) (((a)>(b))?(b):(a))
 
-
-/* Helper function return the max integer 
-int max (int first , int second ){
-    if (first < second )
-    {
-        return second;
-    
-    }else
-    {
-        return first;
-    }
-    
-    
-}*/
-/* Helper function return the min integer 
-int min (int first , int second ){
-    if (first > second)
-    {
-        return second;
-    }else
-    {
-        return first;
-    }
-    
-    
-}*/
 /* This function will set init variabale to zero in entair htable */
 void init_boards(){
     // loop through the entire htable array
@@ -59,12 +33,7 @@ int depth( Board board ){
         if (board[i] == 'X' || board[i] == 'O')
         {
             markers++;
-        }
-        else if (board[i] == 'x' || board[i] == 'o')
-        {
-            markers++;
-        }
-        
+        }  
     }
     // return the number of markers
     return markers ;
@@ -78,22 +47,31 @@ char winner( Board board ){
         // check array of row, column and diagonal positions of win and pos2idx
         if (board[pos2idx[WINS[i][0]]] == 'X' && board[pos2idx[WINS[i][1]]] == 'X' && board[pos2idx[WINS[i][2]]] == 'X'  )
         {
+            int index = board_hash(board);
+            // looping through the possible moves 
+            for (int  i = 0; i < 9; i++){
+                // store a value of -1 in the move array 
+                htable[index].move[i]= -1;
+            }
             return 'X'; //  if X has won the game,
         }
         if (board[pos2idx[WINS[i][0]]] == 'O' && board[pos2idx[WINS[i][1]]] == 'O' && board[pos2idx[WINS[i][2]]] == 'O'  )
         {
+            int index = board_hash(board);
+            // looping through the possible moves 
+            for (int  i = 0; i < 9; i++){
+                // store a value of -1 in the move array 
+                htable[index].move[i]= -1;
+            }
             return 'O'; // if O has won the game
         }
-        
-        
-         //if the game is over and a draw
         
     }
     if (depth(board ) < 9)
     {
         return '?'; // if the game is incomplete and no-one has won.
     }
-    return  '-';
+    return  '-'; //if the game is over and a draw
     
 }
 /* This function return which player turn */
@@ -102,11 +80,6 @@ char turn( Board board ){
     int x = 0;
     // counter for O 
     int o = 0;
-    // game over
-    //char over = '-';
-    // marker indicted turn X or O
-    //char marker;
-
     // if depth equal to 9 
     if (depth(board ) == 9)
     {
@@ -141,7 +114,6 @@ char turn( Board board ){
     {
         return 'X';
     }
-    
     // if X bigger than O then O turn else X turn 
     if (x>o)
     {
@@ -154,7 +126,6 @@ char turn( Board board ){
 }
 /* The function should compute the hash index and set the variables of the structure */
 void init_board( Board board ){
-
     // compute the hash index 
     int index = board_hash(board);
     //init should be set to 1
@@ -167,14 +138,11 @@ void init_board( Board board ){
     strcpy(htable[index].board,board);
     //winner should be winner function for the given board
     htable[index].winner= winner(board);
-
 }
 /* This function should create and join all the nodes of all possible tic-tac-toe games */
 void join_graph( Board board ){
-
     // compute the hash index 
     int index = board_hash(board);
-
     // looping through the possible moves 
     for (int  i = 0; i < 9; i++)
     {
@@ -197,7 +165,10 @@ void join_graph( Board board ){
             //compute the hash value of the new board
             int copyhash = board_hash(copy);
             // store hash value in the move array
+            if (winner(board ) != 'X' && winner(board ) != 'O' )
+            {
             htable[index].move[i]= copyhash;
+            }
             // if the hash table already contains an entry (init!=0)
             if (htable[copyhash].init == 0 )
             {
@@ -205,14 +176,9 @@ void join_graph( Board board ){
                 init_board(copy);
                 //recursively calling join_graph.
                 join_graph(copy);
-            }
-            
-        }
-        
-        
+            }   
+        }   
     }
-    
-
 }
 /* This function should assign a score to each entry in the htable */
 void compute_score(){
@@ -236,6 +202,7 @@ void compute_score(){
             //if the board is a complete game that ends in a tie, then the score is 0
             case '-':
                 htable[i].score = 0;
+                break;
             default:
                 break;
             }
@@ -249,7 +216,7 @@ void compute_score(){
                 {
                     if (htable[i].move[b] != -1)
                     {
-                        htable[i].score =MAX(htable[i].score, htable[htable[i].move[b]].score);
+                        htable[i].score =imax(htable[i].score, htable[htable[i].move[b]].score);
                     }
                     
                 }
@@ -259,31 +226,26 @@ void compute_score(){
             else if (htable[i].turn == 'O')
             {
                 htable[i].score = 1;
-
                 //the score is equal to the minimum of all the valid child nodes in themove array.
                 for (int b = 8; b >= 0; b--)
                 {
                     if (htable[i].move[b] != -1)
                     {
-                        htable[i].score =MIN(htable[i].score, htable[htable[i].move[b]].score);
+                        htable[i].score =imin(htable[i].score, htable[htable[i].move[b]].score);
                     }
                     
                 }
                 
             }
-
             
         }
         
     }
     
-
 }
 /* This function should return the best possible move position. */
 int best_move( int board ){
-
     int move = 0; 
-
     if (htable[board].turn == 'X')
     {
         for (int  i = 0; i < 9; i++)
@@ -308,10 +270,5 @@ int best_move( int board ){
         }
         
     }
-
     return move ; 
-    
-    
-    
-
 }

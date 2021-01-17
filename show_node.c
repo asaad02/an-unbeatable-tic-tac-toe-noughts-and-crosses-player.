@@ -12,23 +12,28 @@
 
 int main(int argc, char const *argv[])
 {
-    //call init_boards
-    init_boards();
-    // call  init_board(START_BOARD)
-    init_board(START_BOARD);
-    // call join_graph(START_BOARD) 
-    join_graph(START_BOARD);
-    // call compute_score()
-    compute_score();
-
+    
+    
     for (int i = 1; i < argc; i++)
     {
         int command = atoi(argv[i]);
-        // for each command line argument it will call print_node
-        print_node( htable[command]);
+        if (command == -1)
+        {
+            printf("Illegal move, try again!\n");
+            argc--;
+        }else
+        {
+            //call init_boards
+            init_boards();
+            // call  init_board(START_BOARD)
+            init_board(START_BOARD);
+            // call join_graph(START_BOARD) 
+            join_graph(START_BOARD);
+            // call compute_score()
+            compute_score();
+            // for each command line argument it will call print_node
+            print_node( htable[command]);
+        }
     }
-    
-
-
     return 0;
 }
